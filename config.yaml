@@ -1,0 +1,11 @@
+# 数据库配置
+database:
+  driver: "postgres"
+  host: "8.138.107.192"
+  port: 15432
+  username: "vivid"
+  password: "vivid"
+  name: "plugins"
+  sslmode: "disable"
+  max_open_conns: 25
+  max_idle_conns: 5

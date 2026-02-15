@@ -241,45 +241,18 @@ req-log-mid/
 ## 集成到现有项目
 
 ```bash
-# 添加依赖
-go get github.com/zxyao/req-log-mid@latest
+dbLogger, err := admin.NewLogger("config.yaml")
+Router := gin.Default()
+Router.Use(reqlogmid.RequestLogger(dbLogger))
+go func() {
+		admin.Start(admin.StartOptions{
+			ConfigPath: "config.yaml",
+			Port:       8080,
+		})
+	}()
 ```
 
-```go
-import (
-	"github.com/gin-gonic/gin"
-	"req-log-mid"
-	"req-log-mid/admin"
-)
 
-func main() {
-	// 创建数据库日志器
-	logger, _ := reqlogmid.NewDBLogger("postgres", "dsn", true, 1000)
-	logger.CreateTable()
-
-	// 配置仓储
-	configRepo := admin.NewConfigRepository(logger.DB())
-	configRepo.InitConfigTable()
-
-	// 加载配置
-	cfg := reqlogmid.DefaultConfig()
-	if dbCfg, err := configRepo.LoadConfig(); err == nil {
-		cfg.Enabled = dbCfg.Enabled
-		cfg.SkipPaths = admin.ParseSkipPaths(dbCfg.SkipPaths)
-	}
-
-	r := gin.Default()
-	r.Use(reqlogmid.RequestLoggerWithConfig(logger, cfg))
-
-	// 管理路由
-	admin.RegisterRoutes(r,
-		admin.NewLogAdminHandler(logger),
-		admin.NewConfigAdminHandler(configRepo, cfg),
-	)
-
-	r.Run(":8080")
-}
-```
 
 ## 许可证
 
